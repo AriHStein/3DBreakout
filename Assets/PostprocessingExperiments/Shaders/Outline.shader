@@ -8,7 +8,7 @@ Shader "Unlit/Outline"
         _NormalThreshold ("Normal Threshold", Range(0,1)) = 0.4
         //_DepthNormalThreshold ("DepthNormal Threshold", Range(0,1)) = 0.5
         //_DepthNormalThresholdScale ("DepthNormal Threshold Scale", Float) = 7
-        _Color("Outline Color", Color) = (1, 1, 1, 1)
+        [HDR]_Color("Outline Color", Color) = (1, 1, 1, 1)
     }
     SubShader
     {

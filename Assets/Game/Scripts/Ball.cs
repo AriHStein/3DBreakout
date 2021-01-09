@@ -6,6 +6,7 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     [SerializeField] float m_launchSpeed;
+    [SerializeField][Range(0,100)] float m_maxSpeed;
     Rigidbody rb;
 
     public event System.Action<Ball> BallDestroyedEvent;
@@ -20,9 +21,9 @@ public class Ball : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(rb.velocity.magnitude > m_launchSpeed)
+        if(rb.velocity.magnitude > m_maxSpeed)
         {
-            rb.velocity = rb.velocity.normalized * m_launchSpeed;
+            rb.velocity = rb.velocity.normalized * m_maxSpeed;
         }
     }
 

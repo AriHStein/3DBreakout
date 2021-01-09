@@ -20,6 +20,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "RotateCamera",
+                    "type": "Value",
+                    "id": "64ee98a5-79dc-4397-8e05-78c77f028b65",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -88,6 +96,39 @@
                     "action": "LaunchBall",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Arrows(Left/Right)",
+                    "id": "4a29076e-935f-411a-ab13-95f10e5a9fc4",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Negative",
+                    "id": "28cf4ecd-2dba-4b12-bc85-0d8de05ccfce",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Positive",
+                    "id": "6a2d4a65-cd4f-4e9e-8edd-fdcad802ab9d",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
