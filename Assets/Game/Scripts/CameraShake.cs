@@ -7,10 +7,10 @@ public class CameraShake : MonoBehaviour
     [SerializeField] float m_maxShakeMagnitue = 3;
     [SerializeField] float m_shakeFrequency = 5;
     [SerializeField] float m_distanceScaleFactor = 20;
-    
+
     CinemachineVirtualCamera m_camera;
     CinemachineBasicMultiChannelPerlin m_noise;
-    
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -23,7 +23,10 @@ public class CameraShake : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float distanceScaledTrauma = Mathf.Clamp01(m_distanceScaleFactor / Vector3.Distance(transform.position, Trauma.Current.transform.position) * Trauma.Value);
-        m_noise.m_AmplitudeGain = m_maxShakeMagnitue * distanceScaledTrauma * distanceScaledTrauma * distanceScaledTrauma;
+        float distance = Mathf.Clamp01(m_distanceScaleFactor / Vector3.Distance(transform.position, Trauma.Current.transform.position));
+
+
+        //float distanceScaledTrauma = Mathf.Clamp01(m_distanceScaleFactor / Vector3.Distance(transform.position, Trauma.Current.transform.position) * Trauma.Value);
+        m_noise.m_AmplitudeGain = m_maxShakeMagnitue * Mathf.Pow(distance * Trauma.Value, 3);
     }
 }

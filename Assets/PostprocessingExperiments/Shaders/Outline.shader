@@ -6,13 +6,13 @@ Shader "Unlit/Outline"
         _Scale ("Scale", int) = 1
         _DepthThreshold ("Depth Threshold", Float) = 0.2
         _NormalThreshold ("Normal Threshold", Range(0,1)) = 0.4
-        //_DepthNormalThreshold ("DepthNormal Threshold", Range(0,1)) = 0.5
-        //_DepthNormalThresholdScale ("DepthNormal Threshold Scale", Float) = 7
+        _DepthNormalThreshold ("DepthNormal Threshold", Range(0,1)) = 0.5
+        _DepthNormalThresholdScale ("DepthNormal Threshold Scale", Float) = 7
         [HDR]_Color("Outline Color", Color) = (1, 1, 1, 1)
     }
     SubShader
     {
-        Tags { "RenderType" = "Opaque" }
+        Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" }
         LOD 200
         
         Pass
@@ -45,11 +45,11 @@ Shader "Unlit/Outline"
 
             float _DepthThreshold;
             float _NormalThreshold;
-            //float _DepthNormalThreshold;
-            //float _DepthNormalThresholdScale;
+            float _DepthNormalThreshold;
+            float _DepthNormalThresholdScale;
             float4 _Color;
 
-            float4x4 _ClipToView;
+            //float4x4 _ClipToView;
 
             // Combines the top and bottom colors using normal blending.
             // https://en.wikipedia.org/wiki/Blend_modes#Normal_blend_mode
@@ -83,7 +83,7 @@ Shader "Unlit/Outline"
             {
                 float4 vertex : SV_POSITION;
                 float2 texcoord : TEXCOORD0;
-                //float3 viewSpaceDir : TEXCOORD1;
+                float3 viewSpaceDir : TEXCOORD1;
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
@@ -97,16 +97,18 @@ Shader "Unlit/Outline"
                 o.texcoord = v.uv;
 
 #if UNITY_UV_STARTS_AT_TOP
+                if (_MainTex_TexelSize.y < 0)
+                    o.texcoord.y = 1 - o.texcoord.y;
                 //o.texcoord = o.texcoord * float2(1.0, -1.0) + float2(0.0, 1.0);
 #endif
 
-                //o.viewSpaceDir = mul(unity_CameraInvProjection, o.vertex).xyz;
+                o.viewSpaceDir = mul(unity_CameraInvProjection, o.vertex).xyz;
 
                 return o;
             }
 
             float4 frag(Varyings i) : SV_Target
-            {   
+            {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
                 // Stepping out 1 pixel at a time asymetrically so each increase in scale only expands by 1 pixel instead of 2
@@ -161,16 +163,17 @@ Shader "Unlit/Outline"
                 // We want to avoid reading thoes as edges, so we also remap the threshold value based on the surface normals
                 
                 // Transform view normal to be in [-1,1] range to match viewSpaceDir for dot
-                //float3 viewNormal = normal0 * 2 - 1; 
-                //float NdotV = 1 - dot(viewNormal, -i.viewSpaceDir);
+                float3 viewNormal = normal0 * 2 - 1; 
+                float NdotV = 1 - dot(viewNormal, -i.viewSpaceDir);
 
-                //float depthNormalThreshold01 = saturate((NdotV - _DepthNormalThreshold) / (1 - _DepthNormalThreshold));
-                //float depthNormalThreshold = depthNormalThreshold01 * _DepthNormalThresholdScale + 1;
+                float depthNormalThreshold01 = saturate((NdotV - _DepthNormalThreshold) / (1 - _DepthNormalThreshold));
+                float depthNormalThreshold = depthNormalThreshold01 * _DepthNormalThresholdScale + 1;
 
-                //float depthThreshold = _DepthThreshold * depth0 * depthNormalThreshold;
-                //edgeDepth = edgeDepth > depthThreshold ? 1 : 0;
-                edgeDepth = edgeDepth > _DepthThreshold ? 1 : 0;
+                float depthThreshold = _DepthThreshold * depth0 * depthNormalThreshold;
+                edgeDepth = edgeDepth > depthThreshold ? 1 : 0;
                 edgeNormal = edgeNormal > _NormalThreshold ? 1 : 0;
+                
+                
                 ///////////// COMBINE RESULTS AND DRAW EDGES ///////////////////////////
 
                 // If either the depth method or normal method is telling us there is an edge
